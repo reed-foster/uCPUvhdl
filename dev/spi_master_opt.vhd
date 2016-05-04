@@ -21,20 +21,20 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity spi_master_opt is
-	port (reset	: in	std_logic;
-			flush	: in	std_logic;
-			pMOSI	: in	std_logic_vector (7 downto 0);
-			w_en	: in	std_logic;
-			clk	: in	std_logic;
-			addr	: in	std_logic_vector (1 downto 0);
-			pMISO	: out	std_logic_vector (7 downto 0);
-			r_en	: in	std_logic;
-			done	: out	std_logic;
-         miso  : in  std_logic;
-         mosi  : out std_logic;
-         sclk  : out std_logic;
-         rst   : out std_logic;
-         ss    : out std_logic_vector (3 downto 0));
+   port (reset	: in  std_logic;
+         flush	: in  std_logic;
+         pMOSI	: in  std_logic_vector (7 downto 0);
+         w_en	: in  std_logic;
+         clk	: in  std_logic;
+         addr	: in  std_logic_vector (1 downto 0);
+         pMISO	: out std_logic_vector (7 downto 0);
+         r_en	: in  std_logic;
+         done	: out std_logic;
+         miso   : in  std_logic;
+         mosi   : out std_logic;
+         sclk   : out std_logic;
+         rst    : out std_logic;
+         ss     : out std_logic_vector (3 downto 0));
 end spi_master_opt;
 
 architecture structural of spi_master_opt is
