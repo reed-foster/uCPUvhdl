@@ -17,13 +17,13 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity adder is
-	generic(dwidth : positive := 1);
-	port (a : in  std_logic_vector (dwidth-1 downto 0);
-			b : in  std_logic_vector (dwidth-1 downto 0);
-			s : out  std_logic_vector (dwidth-1 downto 0));
+   generic(dwidth : positive := 1);
+   port (a : in  std_logic_vector (dwidth-1 downto 0);
+         b : in  std_logic_vector (dwidth-1 downto 0);
+         s : out std_logic_vector (dwidth-1 downto 0));
 end adder;
 
 architecture dataflow of adder is
 begin
-	s <= std_logic_vector(signed(a) + signed (b));
+   s <= std_logic_vector(signed(a) + signed (b));
 end dataflow;
