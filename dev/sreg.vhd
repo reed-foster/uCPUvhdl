@@ -22,14 +22,14 @@ use ieee.std_logic_1164.all;
 
 entity sreg is
    generic(len : positive := 8);
-   port (pdata_in    : in  std_logic_vector (len-1 downto 0);
-         pdata_out   : out std_logic_vector (len-1 downto 0);
-			data_in     : in  std_logic;
-			data_out    : out std_logic;
-			shift       : in  std_logic;
-			load        : in  std_logic;
-			clock       : in  std_logic;
-         clear       : in  std_logic);
+   port (pdata_in  : in  std_logic_vector (len-1 downto 0);
+         pdata_out : out std_logic_vector (len-1 downto 0);
+         data_in   : in  std_logic;
+         data_out  : out std_logic;
+         shift     : in  std_logic;
+         load      : in  std_logic;
+         clock     : in  std_logic;
+         clear     : in  std_logic);
 end sreg;
 
 architecture behavioral of sreg is
