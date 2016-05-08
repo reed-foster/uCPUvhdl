@@ -4,7 +4,7 @@ In this version, several new functions are added, and the memory received an (al
 
 Hierarchy (component names aren't exact):
 
-    #core - core.vhd
+    core - core.vhd
       fetch_unit - instruction_fetch.vhd
         pcmux - mux.vhd
         pcinc - adder.vhd
