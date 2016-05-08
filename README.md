@@ -7,4 +7,4 @@ muCPUv2 - second version
 
 muCPUv2_1 - latest version (more memory, instructions)
 
-The formatting of the VHDL code is messy because the tab size is different for the IDE than it is for Github (add ?ts=3 to the end of the url when viewing the .vhd files)
+The formatting of the VHDL code is messy (for some files) because the tab size is different for the IDE than it is for Github (add ?ts=3 to the end of the url when viewing the .vhd files). I've now switched my IDE to add spaces instead of tabs when I press "tab", so new files shouldn't have this problem.
