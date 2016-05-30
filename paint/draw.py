@@ -1,6 +1,7 @@
 from Tkinter import *
 from tkFileDialog import *
 from tkFont import *
+import tkMessageBox
 import os.path
 import sys
 import re
@@ -82,6 +83,7 @@ canvasarray = [
 basefilename = "Untitled"
 filename = ""
 fileexists = False
+saved = True
 
 eraser = "square"
 brush = "star"
@@ -124,13 +126,22 @@ def openFile():
         frame.title("OLED Drawing Tool [" + basefilename + "]")
         frame.focus()
         updatebmpdat()
-        print "File Opened"
+        #print "File Opened"
         saved = True
         fileexists = True
     
 def saveFile():
     global filename
     global saved
+    global basefilename
+    name, ext= os.path.splitext(filename)
+    if ext == ".xbm":
+        tempfilename = re.split("\.", basefilename)[0] + ".obm"
+        if tkMessageBox.askyesno("File Type Error", "Cannot save to .xbm file types.\nSave as " + tempfilename + "?"):
+            filename = name + ".obm"
+        else:
+            return "Save Failed"
+    basefilename = os.path.basename(filename)
     bmpfile = open(filename, "w")
     bmpfile.seek(0)
     bmpfile.truncate()
@@ -142,7 +153,7 @@ def saveFile():
     bmpfile.close()
     frame.title("OLED Drawing Tool [" + basefilename + "]")
     frame.focus()
-    print "Save Complete"
+    return "Save Complete"
     saved = True
 
 def saveFileAs():
@@ -166,12 +177,30 @@ def saveFileAs():
         filemenu.entryconfig(filemenu.index("Overwrite"), state = NORMAL)
         frame.title("OLED Drawing Tool [" + basefilename + "]")
         frame.focus()
-        print "Save Complete"
         fileexists = True
         saved = True
+        return "Save Complete"
+    else:
+        return "Save Failed"
     
         
 def exitApp():
+    global saved
+    if not saved:
+        quitmsg = tkMessageBox.askyesnocancel("Quit?", "The current file is not saved.\nSave file?")
+        if quitmsg == None:
+            frame.focus()
+            return
+        if quitmsg:
+            if fileexists:
+                if saveFile() != "Save Complete":
+                    frame.focus()
+                    return
+            else:
+                if saveFileAs() != "Save Complete":
+                    frame.focus()
+                    return
+    #print "Exiting App..."
     frame.destroy()
     sys.exit()
 
@@ -339,9 +368,13 @@ def updatearray(event, color):
     updatebmpdat()
         
 def drawblack(event):
+    global saved
+    saved = False
     updatearray(event, "black")
 
 def drawwhite(event):
+    global saved
+    saved = False
     updatearray(event, "white")
 
 def click(event):
@@ -459,6 +492,7 @@ def copy():
 
 Tk().withdraw()
 frame = Toplevel(bg="#FFFFFF")
+frame.protocol('WM_DELETE_WINDOW', exitApp)
 headerfont = Font(frame, family = "Calibri", size = 12, weight = "bold")
 imgheader = Canvas(frame, width = 100, height = 20, bg = "#FFFFFF")
 imgheader.grid(row=0,column=0,sticky=W+E)
