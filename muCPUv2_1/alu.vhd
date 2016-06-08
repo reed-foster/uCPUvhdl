@@ -34,7 +34,7 @@ begin
    
    --sll function
    with bshort select
-      shift_rt <= A (6 downto 0) & "0" when      "001",
+      shift_lf <= A (6 downto 0) & "0" when      "001",
                   A (5 downto 0) & "00" when     "010",
                   A (4 downto 0) & "000" when    "011",
                   A (3 downto 0) & "0000" when   "100",
@@ -45,7 +45,7 @@ begin
    
    --srl function
    with bshort select
-      shift_lf <= "0" & A (7 downto 1) when      "001",
+      shift_rt <= "0" & A (7 downto 1) when      "001",
                   "00" & A (7 downto 2) when     "010",
                   "000" & A (7 downto 3) when    "011",
                   "0000" & A (7 downto 4) when   "100",
@@ -68,8 +68,8 @@ begin
    
    --Output generation
    with op select
-      R <= shift_rt when      "0000",
-           shift_lf when      "0001",
+      R <= shift_lf when      "0000",
+           shift_rt when      "0001",
            addval when        "0010",
            subval when        "0011",
            not (A and B) when "0100",
