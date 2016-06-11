@@ -60,13 +60,13 @@ begin
                "0010" when (is_ldi = '1') else
                func (3 downto 0);
 	
-	--signal logic
+   --signal logic
    func       <= instruction (4 downto 0);
    opcode_tmp <= instruction (15 downto 14);
    is_mem     <= is_load or is_store;
    wb_en      <= not (is_branch or is_store);
 	
-	--outputs assignment
+   --outputs assignment
    imm <= instruction (7 downto 0);
    rs  <= "000" when (is_ldi = '1') else instruction (13 downto 11);
    rt  <= rt_tmp;
