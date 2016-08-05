@@ -50,7 +50,7 @@ begin
 	
    rt_tmp <= instruction (10 downto 8);
 
-   alu_tmp <=  "0001" when (is_mem = '1') else
+   alu_tmp <=  "0010" when (is_mem = '1') else
                "1000" when (is_branch = '1' and rt_tmp = "000") else
                "1001" when (is_branch = '1' and rt_tmp = "001") else
                "1010" when (is_branch = '1' and rt_tmp = "010") else
