@@ -80,46 +80,45 @@ architecture structural of instruction_fetch is
       end component;
       
 begin
-	--multiplexer for pc
-	pcmux0			: mux 	generic map(dwidth 		=> 16)
-										port map(data_in_0	=> pcinc_out,
-													data_in_1	=> pc_in,
-													sel			=> ringct2,
-													data_out		=> pcmux_out);
-													
+   --multiplexer for pc
+   pcmux0 : mux generic map(dwidth    => 16)
+                   port map(data_in_0 => pcinc_out,
+                            data_in_1 => pc_in,
+                            sel       => ringct2,
+                            data_out  => pcmux_out);
+
 	--adder; increments pc
-	pcinc0 			: adder	generic map(dwidth 		=> 16)
-										port map(a				=> pcout_tmp,
-													b				=> open,
-													s				=> pcinc_out);
-													
-	--register
-	pcreg0 			: reg		generic map(dwidth		=> 16,
-													q_init		=> romstartaddr)
-										port map(D				=> pcmux_out,
-													en				=> reg_we,
-													clk			=> clk,
-													clr			=> open,
-													Q				=> pcout_tmp);
-													
-	--specialized shift register
-	ishift0			: instructionshifter
-										port map(shift_in		=> instr_byte_ser,
-													clk			=> clk,
-													en				=> ishift_we,
-													shift_out	=> instr_word_out);
-													
-	--or gate to enable pc
-	reg_we_or0		: or_gate_3	port map(a 				=> ringct0,
-													b 				=> ringct1,
-													c 				=> ringct2,
-													s 				=> reg_we);
-													
-	--or gate to enable ishift instruction shifter
-	ishift_we_or0	: or_gate_2		port map(a => ringct0,
-													b => ringct1,
-													s => ishift_we);
-													
-	--set pcout to value of temp signal
-	pc_out <= pcout_tmp;
+   pcinc0 : adder generic map(dwidth => 16)
+                     port map(a => pcout_tmp,
+                              b => open,
+                              s => pcinc_out);
+
+   --register
+   pcreg0 : reg generic map(dwidth => 16,
+                            q_init => romstartaddr)
+                   port map(D   => pcmux_out,
+                            en  => reg_we,
+                            clk => clk,
+                            clr => open,
+                            Q   => pcout_tmp);
+
+   --specialized shift register
+   ishift0 : instructionshifter port map(shift_in  => instr_byte_ser,
+                                         clk       => clk,
+                                         en        => ishift_we,
+                                         shift_out => instr_word_out);
+
+   --or gate to enable pc
+   reg_we_or0 : or_gate_3 port map(a => ringct0,
+                                   b => ringct1,
+                                   c => ringct2,
+                                   s => reg_we);
+
+   --or gate to enable ishift instruction shifter
+   ishift_we_or0 : or_gate_2 port map(a => ringct0,
+                                      b => ringct1,
+                                      s => ishift_we);
+
+   --set pcout to value of temp signal
+   pc_out <= pcout_tmp;
 end structural;
