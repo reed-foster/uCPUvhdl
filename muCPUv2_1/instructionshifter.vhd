@@ -25,23 +25,23 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity instructionshifter is
-	port (shift_in 	: in  std_logic_vector (7 downto 0);
-         clk 			: in  std_logic;
-         en 			: in  std_logic;
-         shift_out	: out  std_logic_vector (15 downto 0));
+   port (shift_in  : in  std_logic_vector (7 downto 0);
+         clk       : in  std_logic;
+         en        : in  std_logic;
+         shift_out : out  std_logic_vector (15 downto 0));
 end instructionshifter;
 
 architecture behavioral of instructionshifter is
-	signal shift_tmp : std_logic_vector (15 downto 0) := (others => '0');
+   signal shift_tmp : std_logic_vector (15 downto 0) := (others => '0');
 begin
-	shift: process(shift_in, clk, en)
-	begin
-		if (rising_edge(clk)) then
-			if (en = '1') then
-				shift_tmp <= shift_tmp (7 downto 0) & shift_in;
-			end if;
-		end if;
-	end process;
-	shift_out <= shift_tmp;
+   shift: process(shift_in, clk, en)
+   begin
+      if (rising_edge(clk)) then
+         if (en = '1') then
+            shift_tmp <= shift_tmp (7 downto 0) & shift_in;
+         end if;
+      end if;
+   end process;
+   shift_out <= shift_tmp;
 end behavioral;
 
