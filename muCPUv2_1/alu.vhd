@@ -19,7 +19,7 @@ use ieee.numeric_std.all;
 entity alu is
    port (A  : in std_logic_vector (7 downto 0);
          B  : in std_logic_vector (7 downto 0);
-         op : in std_logic_vector (3 downto 0);
+         op : in std_logic_vector (5 downto 0);
          R  : out std_logic_vector(7 downto 0));
 end alu;
 
@@ -68,22 +68,19 @@ begin
    
    --Output generation
    with op select
-      R <= shift_lf when      "0000",
-           shift_rt when      "0001",
-           addval when        "0010",
-           subval when        "0011",
-           not (A and B) when "0100",
-           not (A or B) when  "0101",
-           A and B when       "0110",
-           A or B when        "0111",
-           bez_res when       "1000",
-           bnez_res when      "1001",
-           bgez_res when      "1010",
-           blez_res when      "1011",
-           bgz_res when       "1100",
-           blz_res when       "1101",
+      R <= shift_lf when      "000000",
+           shift_rt when      "000001",
+           addval when        "000010",
+           subval when        "000011",
+           not (A and B) when "000100",
+           not (A or B) when  "000101",
+           A and B when       "000110",
+           A or B when        "000111",
+           bez_res when       "100000",
+           bnez_res when      "100001",
+           bgez_res when      "100010",
+           blez_res when      "100011",
+           bgz_res when       "100100",
+           blz_res when       "100101",
            "00000000" when    others; --also useful for debugging
 end dataflow;
-
-
-
