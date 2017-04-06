@@ -1,4 +1,4 @@
-#draw.py
+# draw.py
 This simple python application runs a GUI that allows the user to draw black and white bitmaps and copy-paste the vhdl code for a static array
 
 both draw.py and xbmarray_remapper.py must be in the same directory for the application to work
