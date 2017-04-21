@@ -17,14 +17,15 @@ canvaswidthdefault = 20
 canvaswidth = canvaswidthdefault
 currentlength = 1
 
-mnemonicstring = "sll|srl|add|sub|nand|nor|and|or|bez|bnez|bgez|blez|bgz|blz|li|lb|sb"
+mnemonicstring = "sll|srl|add|sub|nand|nor|and|or|bez|bnez|bgez|blez|bgz|blz|li|lb|sb|nop"
 registerstring = "r0|r1|r2|r3|r4|r5|r6|r7"
+branchmnemonicstring = "bez|bnez|bgez|blez|bgz|blz"
 
 def openFile():
     global filename
     global basefilename
     global saved
-    openfilename = askopenfilename()
+    openfilename = askopenfilename(filetypes = [("muCPU Assembly Language Files", "*.masm")])
     if openfilename is not None:
         filename = openfilename
         basefilename = os.path.basename(filename)
@@ -38,6 +39,12 @@ def openFile():
         frame.title("muCPU Assembler [" + basefilename + "]")
         frame.focus()
         initonOpen()
+        scrollbary.activate("arrow1")
+        scrollbarx.activate("arrow1")
+        scrollbary.activate("slider")
+        scrollbarx.activate("slider")
+        scrollbary.activate("arrow2")
+        scrollbarx.activate("arrow2")
         print "File Opened"
         saved = True
     
@@ -59,7 +66,7 @@ def saveFileAs():
     global fileexists
     global basefilename
     global saved
-    saveasfilename = asksaveasfilename()
+    saveasfilename = asksaveasfilename(defaultextension = ".masm", filetypes = [("muCPU Assembly Language Files", "*.masm")])
     if saveasfilename is not None:
         filename = saveasfilename
         basefilename = os.path.basename(filename)
@@ -80,15 +87,51 @@ def saveFileAs():
 def exitApp():
     frame.destroy()
     sys.exit()
+
+def valid_command(asm):
+    global mnemonicstring
+    if (asm == "" or asm[:1] == "//"):
+        return False
+    if (":" in asm):
+        asmshort = asm[asm.find(":") + 1:].lstrip()
+        opcode = re.split(" ", asmshort)[0]
+    else:
+        opcode = re.split(" ", asm)[0]
+    if (opcode in mnemonicstring):
+        return True
+    else:
+        return False
     
 def compileASM():
     global filename
     cpu_out = ""
+    asm_out = []
+    labels = {}
     asm_in = textArea.get("1.0", END)
     asmlines = re.split("\n", asm_in)
     for i in range (len(asmlines)):
-        if (asmlines[i] != ""):
-            cpu_out += str(i) + " => x\"" + decode(asmlines[i]) + "\",\n"
+        asmlines[i] = asmlines[i].lstrip()
+        print asmlines[i]
+        if (valid_command(asmlines[i])):
+            asm_out.append(asmlines[i][:asmlines[i].find("//")].rstrip())
+    for j in range (len(asm_out)):
+        if ":" in asm_out[j]:
+            labels[asm_out[j][:asm_out[j].find(":")]] = j
+            asm_out[j] = asm_out[j][asm_out[j].find(":") + 1:].lstrip()
+        #print asm_out
+    print asm_out
+    for k in range (len(asm_out)):
+        #print asm_out[k]
+        if re.split(" ", asm_out[k])[0] in branchmnemonicstring:
+            print asm_out[k]
+            label = re.split(" ", asm_out[k])[2]
+            try:
+                intlabel = int(label)
+            except:
+                asm_out[k] = asm_out[k][:asm_out[k].find(label)]
+                asm_out[k] += str((labels[label] - k - 1) * 2)
+                print asm_out[k]
+        cpu_out += str(k) + " => x\"" + decode(asm_out[k]) + "\",\n"
     name, ext = os.path.splitext(filename)
     hexfilename = name + ".hex"
     hexfile = open(hexfilename, "w")
@@ -131,6 +174,19 @@ def highlightSyntax(start, end):
     registerlen = StringVar()
     numberlen = StringVar()
     commentlen = StringVar()
+    area = textArea.get(start, end)
+    '''
+    if "\n" in area:
+        lines = re.split("\n", area)
+    else:
+        lines = [area]
+    for i in range (len(lines)):
+        if ":" in lines[i]:
+            textArea.tag_add("label", start + " + " + str(i) + "lines", start + " + " + str(i) + "lines" + " + " + str(lines[i].find(":") + 1) + "c")
+        if "//" in lines[i]:
+            textArea.tag_add("comment", start + " + " + str(i) + "lines" + " + " + str(lines[i].find("//")) + "c", "lineend")
+        args = re.split(" |, |\(|\)", lines[i])
+        '''
     pos = start
     while True:
         pos = textArea.search(mnemonicstring, pos, end, regexp = True, count = mnemoniclen)
@@ -139,7 +195,7 @@ def highlightSyntax(start, end):
         textArea.tag_add("mnemonic", pos, pos + " + " + str(mnemoniclen.get()) + "c")
         posarry = re.split("\.", pos)
         posarry[1] = str(int(posarry[1]) + 1)
-        pos = posarry[0] + "." + posarry[1] + ("0" * (len(posarry[1]) - 2))
+        pos = posarry[0] + "." + posarry[1]# + ("0" * (len(posarry[1]) - 2))
     pos = start
     while True:
         pos = textArea.search("-?\\d", pos, end, regexp = True, count = numberlen)
@@ -148,7 +204,7 @@ def highlightSyntax(start, end):
         textArea.tag_add("number", pos, pos + " + " + str(numberlen.get()) + "c")
         posarry = re.split("\.", pos)
         posarry[1] = str(int(posarry[1]) + 1)
-        pos = posarry[0] + "." + posarry[1] + ("0" * (len(posarry[1]) - 2))
+        pos = posarry[0] + "." + posarry[1]# + ("0" * (len(posarry[1]) - 2))
     pos = start
     while True:
         pos = textArea.search(registerstring, pos, end, regexp = True, count = registerlen)
@@ -157,7 +213,7 @@ def highlightSyntax(start, end):
         textArea.tag_add("register", pos, pos + " + " + str(registerlen.get()) + "c")
         posarry = re.split("\.", pos)
         posarry[1] = str(int(posarry[1]) + 1)
-        pos = posarry[0] + "." + posarry[1] + ("0" * (len(posarry[1]) - 2))
+        pos = posarry[0] + "." + posarry[1]# + ("0" * (len(posarry[1]) - 2))
     pos = start
     while True:
         pos = textArea.search("//", pos, end, regexp = False, count = commentlen)
@@ -166,7 +222,7 @@ def highlightSyntax(start, end):
         textArea.tag_add("comment", pos, re.split("\.", pos)[0] + ".end")
         posarry = re.split("\.", pos)
         posarry[1] = str(int(posarry[1]) + 1)
-        pos = posarry[0] + "." + posarry[1] + ("0" * (len(posarry[1]) - 2))
+        pos = posarry[0] + "." + posarry[1]# + ("0" * (len(posarry[1]) - 2))
     
 
 def keypressed(event):
@@ -175,12 +231,14 @@ def keypressed(event):
     frame.title("muCPU Assembler *[" + basefilename + "]*")
     updateHighlightEvent(event)
     updateLinesEvent(event)
-    scrollbar.set
+    scrollbarx.set
+    scrollbary.set
 
 def updateall(event):
     highlightSyntax("1.0", END)
     updateLinesEvent(event)
-    scrollbar.set
+    scrollbarx.set
+    scrollbary.set
 
 def saveevent(event):
     saveFile()
@@ -188,19 +246,23 @@ def saveevent(event):
 Tk().withdraw()
 frame = Toplevel(bg="#D8D8D8")
 
-frame.bind("<Button-1>", updateall)
-frame.bind("<MouseWheel>", updateall)
-frame.bind("<B1-Motion>", updateall)
-frame.bind("<ButtonRelease-1>", updateall)
+frame.bind("<Configure>", updateall)
+frame.bind("<Button-1>", updateLinesEvent)
+frame.bind("<MouseWheel>", updateLinesEvent)
+frame.bind("<B1-Motion>", updateLinesEvent)
+frame.bind("<ButtonRelease-1>", updateLinesEvent)
 frame.bind("<Key>", keypressed)
 frame.bind("<Control-s>", saveevent)
 
-scrollbar = Scrollbar(frame)
-scrollbar.pack(side = RIGHT, fill = Y)
+scrollbary = Scrollbar(frame)
+scrollbary.pack(side = RIGHT, fill = Y)
+scrollbarx = Scrollbar(frame, orient = HORIZONTAL)
+scrollbarx.pack(side = BOTTOM, fill = X)
 frame.title("muCPU Assembler [" + basefilename + "]")
-textArea = Text(frame, height = 30, width = 100, padx = 3, pady = 3, yscrollcommand = scrollbar.set, selectbackground="#C5C5C5")
+textArea = Text(frame, height = 60, width = 100, padx = 3, pady = 0, yscrollcommand = scrollbary.set, selectbackground="#C5C5C5", xscrollcommand = scrollbarx.set, wrap = NONE)
 textArea.pack(side=RIGHT)
-scrollbar.config(command=textArea.yview)
+scrollbary.config(command=textArea.yview)
+scrollbarx.config(command=textArea.xview)
 
 mnemonicfont = Font(frame, family = "Courier", size = 10, weight = "bold")
 textArea.tag_config("mnemonic", foreground = "blue", font = mnemonicfont)
@@ -210,8 +272,10 @@ registerfont = Font(frame, family = "Courier", size = 10)#, slant = "italic")
 textArea.tag_config("register", foreground = "red", font = registerfont)
 commentfont = Font(frame, family = "Courier", size = 10)#, slant = "italic")
 textArea.tag_config("comment", foreground = "#3FA023", font = commentfont)
+#labelfont = Font(frame, family = "Courier", size = 10, weight = "bold")
+#textArea.tag_config("label", foreground = "#555555", font = labelfont)
 
-linenumbers = Canvas(frame, width = canvaswidthdefault, height = 487, bg = "#D8D8D8", highlightbackground = "#D8D8D8")
+linenumbers = Canvas(frame, width = canvaswidthdefault, height = 955, bg = "#D8D8D8", highlightbackground = "#D8D8D8")
 linenumbers.pack()
 
 menubar = Menu(frame)
