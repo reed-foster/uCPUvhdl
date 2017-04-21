@@ -8,14 +8,19 @@ def asmtoint(asm):
     for i in range (len(asm_split)):
         if (asm_split[i] != ""):
             args.append(asm_split[i])
-    #print args
     opcode = 0
     func = 0
     rd = 0
     rs = 0
     rt = 0
     imm = 0
-    if (args[0] == "sll"):
+    if (args[0] == "nop"):
+        opcode = 0
+        func = 0
+        rd = 0
+        rs = 0
+        rt = 0
+    elif (args[0] == "sll"):
         if (len(args) != 4):
             return 0,0,0,0,0,0
         opcode = 0
@@ -23,7 +28,7 @@ def asmtoint(asm):
         rd = int(args[1][1:])
         rs = int(args[2][1:])
         rt = int(args[3][1:])
-    if (args[0] == "srl"):
+    elif (args[0] == "srl"):
         if (len(args) != 4):
             return 0,0,0,0,0,0
         opcode = 0
